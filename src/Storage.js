@@ -12,6 +12,17 @@ function ensureLocalStorageIsAvailable() {
 	}
 }
 
+function all () {
+	let recipes = [];
+
+	Object.keys(localStorage).forEach(index => {
+		if (index.startsWith(RECIPE_KEY_PREFIX)) {
+			recipes.push(JSON.parse(localStorage[index]));
+		}
+	});
+
+	return recipes;
+}
 
 function add (key, value) {	
 	if (exists(key)) {
@@ -21,6 +32,16 @@ function add (key, value) {
 	localStorage.setItem(getKeyName(key), stringify(value));
 
 	return true;
+}
+
+function remove(key) {
+	if (!exists(key)) {
+		throw new Error("An errror occurred while we tried deleting this recipe");
+	}
+
+	localStorage.removeItem(getKeyName(key));
+
+	return !exists(key);
 }
 
 function exists(key) {
@@ -35,4 +56,4 @@ function stringify (value) {
 	return JSON.stringify(value);
 }
 
-export {ensureLocalStorageIsAvailable, add};
+export {ensureLocalStorageIsAvailable, add, all, remove};

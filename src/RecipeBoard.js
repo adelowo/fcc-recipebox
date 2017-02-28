@@ -1,19 +1,17 @@
 import React from "react";
-import {ensureLocalStorageIsAvailable, add} from "./Storage"; 
+import {add, all} from "./Storage"; 
 import Modal from "./Modal";
 import Form from "./Form";
+import RecipeBox from "./RecipeBox";
 
 
 const RecipeBoard = React.createClass({
 
 	getInitialState() {
 		return {
-			"add" : false //add a new recipe ?
+			"add" : false, //add a new recipe ?
+			"recipes" : all()
 		}
-	},
-
-	componentWilMount() {
-		ensureLocalStorageIsAvailable();
 	},
 
 	render () {
@@ -25,6 +23,8 @@ const RecipeBoard = React.createClass({
 			modal = <Modal title="Add a new recipe" form={form} close={this.close} />;
 		}
 
+		let recipes = this.state.recipes;
+
 		return (
 			<div className="container">
 			    <div className="columns">
@@ -35,7 +35,10 @@ const RecipeBoard = React.createClass({
 			        </div>
 
 			        <div className="column col-md-6">
-
+			        	{recipes.map((recipe) => {
+			        		return (<RecipeBox key={recipe.title} 
+			        			{...recipe} reload={this.reload} />)
+			        	})}
 			        </div>
 			        
 			        <div className="column col-md-3">
@@ -62,14 +65,18 @@ const RecipeBoard = React.createClass({
 	addNewRecipe(data) {
 
 		if (add(data.title, data)) {
-			this.setState({
-				'add' : false
-			});
-
+			this.reload();
 			return;
 		}
 
 		alert(`A recipe box with the title, ${data.title} already exists`)
+	},
+
+	reload() {
+		this.setState({
+			'add' : false,
+			'recipes' : all()
+		});	
 	}
 });
 
